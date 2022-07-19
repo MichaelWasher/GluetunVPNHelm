@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gluetun-vpn.fullname" . }}
+  labels:
+    {{- include "gluetun-vpn.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: http-proxy
+    port: {{ .Values.ports.httpProxy }}
+    protocol: TCP
+    targetPort: {{ .Values.ports.httpProxy }}
+  - name: shadowsocks-udp
+    port: {{ .Values.ports.shadowsocksUdp }}
+    protocol: UDP
+    targetPort: {{ .Values.ports.shadowsocksUdp  }}
+  - name: shadowsocks-tcp
+    port:  {{ .Values.ports.shadowsocksTcp }}
+    protocol: TCP
+    targetPort: {{ .Values.ports.shadowsocksTcp }}
+  - name: socks5-proxy
+    port: {{ .Values.ports.socks5  }}
+    protocol: TCP
+    targetPort: {{ .Values.ports.socks5 }}
+  selector:
+    {{- include "gluetun-vpn.selectorLabels" . | nindent 4 }}
+  type: {{ .Values.service.type }}

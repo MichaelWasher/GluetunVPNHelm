@@ -1,0 +1,15 @@
+NOTE: The following values MUST be overwritten in the values file for the Deployment to work correctly.
+
+client:
+  user: "USER"
+  password: "PASS"
+  certificate: |
+    -----BEGIN CERTIFICATE-----
+    ...........................
+    -----END CERTIFICATE-----
+  ca: |
+    -----BEGIN CERTIFICATE-----
+    ...........................
+    -----END CERTIFICATE-----
+  key: EXAMPLEKEY
+

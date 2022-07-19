@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gluetun-vpn.fullname" . }}
+  labels:
+    {{- include "gluetun-vpn.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "gluetun-vpn.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gluetun-vpn.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gluetun-vpn.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          # image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: docker.io/qmcgaw/gluetun
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          env:
+          # Define Logging
+          - name: SHADOWSOCKS_LOG
+            value: "on"
+          - name: HTTPPROXY
+            value: "on"
+          # Endpoints
+          - name: SHADOWSOCKS
+            value: "on"
+          - name: HTTPPROXY_LOG
+            value: "on"
+          # VPN Config
+          - name: VPN_SERVICE_PROVIDER
+            value: cyberghost
+          - name: OPENVPN_USER
+            value: {{ .Values.client.user }}
+          - name: OPENVPN_PASSWORD
+            value: {{ .Values.client.password }}
+          # Country
+          - name: SERVER_COUNTRIES
+            value: Netherlands
+          # Misc
+          - name: SHADOWSOCKS_CIPHER
+            value: chacha20-ietf-poly1305
+          ports:
+          - containerPort: {{ .Values.ports.httpProxy }}
+            protocol: TCP
+            name: http
+          - containerPort: {{ .Values.ports.shadowsocksTcp }}
+            protocol: TCP
+            name: shadowsocks-tcp
+          - containerPort: {{ .Values.ports.shadowsocksUdp }}
+            protocol: UDP
+            name: shadowsocks-udp
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: client-config
+            mountPath: /gluetun/client.crt
+            subPath: client.crt
+          - name: client-config
+            mountPath: /gluetun/ca.crt
+            subPath: ca.crt
+          - name: client-key
+            mountPath: /gluetun/client.key
+            subPath: client.key
+          
+        - image: quay.io/mwasher/shadowsocks
+          name: socks5-proxy
+          args:
+            - -c 
+            - ss://chacha20-ietf-poly1305:@localhost: {{- .Values.ports.shadowsocksTcp }}
+            - -socks 
+            - :{{ .Values.ports.socks5 }}
+            - -verbose
+          ports:
+          - containerPort: {{ .Values.ports.socks5 }}
+            protocol: TCP
+            name: socks5-proxy
+      volumes:
+      - name: client-config
+        configMap:
+          name: client
+      - name: client-key
+        secret:
+          secretName: client-key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
