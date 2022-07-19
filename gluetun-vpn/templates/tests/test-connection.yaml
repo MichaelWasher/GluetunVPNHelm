@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "gluetun-vpn.fullname" . }}-test-connection"
+  labels:
+    {{- include "gluetun-vpn.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "gluetun-vpn.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
