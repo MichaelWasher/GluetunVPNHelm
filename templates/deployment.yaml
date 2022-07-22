@@ -43,14 +43,14 @@ spec:
             value: "on"
           # VPN Config
           - name: VPN_SERVICE_PROVIDER
-            value: cyberghost
+            value: {{ .Values.client.vpnProvider | lower }}
           - name: OPENVPN_USER
             value: {{ .Values.client.user }}
           - name: OPENVPN_PASSWORD
             value: {{ .Values.client.password }}
           # Country
           - name: SERVER_COUNTRIES
-            value: Netherlands
+            value: {{ .Values.client.country }}
           # Misc
           - name: SHADOWSOCKS_CIPHER
             value: chacha20-ietf-poly1305

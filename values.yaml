@@ -59,7 +59,9 @@ client:
     ...........................
     -----END CERTIFICATE-----
   key: EXAMPLEKEY
-
+  country: Australia
+  vpnProvider: Cyberghost
+  
 ports:
   httpProxy: 8888
   shadowsocksUdp: 8388

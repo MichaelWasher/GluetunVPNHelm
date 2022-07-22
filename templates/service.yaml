@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "gluetun-vpn.fullname" . }}
+  name: {{ .Values.client.vpnProvider | lower }}-{{ .Values.client.country | lower }}
   labels:
     {{- include "gluetun-vpn.labels" . | nindent 4 }}
 spec:
