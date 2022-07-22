@@ -1,4 +1,5 @@
 # Gluetun VPN Helm
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gluetun-vpn)](https://artifacthub.io/packages/search?repo=gluetun-vpn)
 
 Gluetun VPN Helm is a HelmChart that is used to install and configure the [Gluetun VPN Client tool](https://github.com/qdm12/gluetun).
 
